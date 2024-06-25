@@ -1,4 +1,5 @@
-// geht über alle Knoten mit wikidataId (=Q... Nummer) und erzeugt entsprechende Knoten/Properties mit den Inhalten aus wikidata
+// iterates all nodes having a wikidataId (=Q... Nummer) property and creates nodes/properties with matching data from wikidata
+// uses a sparql query to access wikidata
 WITH [
 // alles was hier steht wird als Property eines Knotens angelegt
 "http://www.wikidata.org/entity/P21", // sex or gender
