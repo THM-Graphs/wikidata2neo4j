@@ -1,0 +1,13 @@
+// update Place nodes with location coordinates from wikidata 
+
+MATCH (p:Place)
+WHERE p.wikidataId IS NOT NULL AND p.nLatLong IS NULL
+WITH split(p.wikidataId,"/")[-1] AS id, p
+WITH apoc.text.format("SELECT ?coordinate WHERE { wd:%s wdt:P625 ?coordinate }", [id]) AS sparql,p
+CALL apoc.load.jsonParams("https://query.wikidata.org/sparql?query=" + apoc.text.urlencode(sparql),
+{ Accept: "application/sparql-results+json"},null)
+YIELD value
+UNWIND value.results.bindings AS binding
+WITH p, apoc.text.regexGroups(binding.coordinate.value, "Point\(([0-9.]+) ([0-9.]+)\)")[0] as groups
+SET p.nLatLong = point({latitude: toFloat(groups[2]), longitude: toFloat(groups[1])}), p.latitude=groups[2], p.longitude=groups[1]
+return count(*)
